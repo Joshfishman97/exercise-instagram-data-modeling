@@ -9,36 +9,48 @@ from eralchemy import render_er
 
 Base = declarative_base()
 
-class Follower(Base):
-    __tablename__ = 'follower'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    user_from_id = Column(Integer, primary_key=True)
-    user_to_id  = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
-
-class Follower_to_User(Base):
-    __tablename__ = 'follower_to_user'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    user_from_id = Column(Integer, ForeignKey('user.id'),primary_key=True)
-    user_to_id  = Column(Integer,  ForeignKey('user.id'),primary_key=True)
-    name = Column(String(250), nullable=False)
 
 
-class Users(Base):
+class User(Base):
     __tablename__ = 'user'
     # Here we define columns for the table address.
     # Notice that each column is also a normal Python instance attribute.
     id = Column(Integer, primary_key=True)
-    username = Column(String(20),nullable=False)
+    username = Column(String(20),nullable=False,index=True)
     firstname = Column(String(20),nullable=False)
     lastname = Column(String(20),nullable=False)
-    email = Column(String(250), nullable=False)
-    # person = relationship(Person)
+    email = Column(String(250), nullable=False,unique=True)
+   
+
+class Follower(Base):
+    __tablename__ = 'follower'
+    # Here we define columns for the table person
+    # Notice that each column is also a normal Python instance attribute.
+    user_from_id = Column(Integer, ForeignKey('user.id') ,primary_key=True)
+    user_from = relationship(User)
+    user_to_id  = Column(Integer, ForeignKey('user.id') ,primary_key=True)
+    user_to = relationship(User)
     
+    
+class Post(Base):
+    __tablename__ = 'post'
+    # Here we define columns for the table person
+    # Notice that each column is also a normal Python instance attribute.
+    id = Column(Integer, primary_key=True)
+    user_id  = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
+
+
+class Likes(Base):
+    __tablename__ = 'likes'
+    id = Column(Integer, primary_key=True)
+    user_id  = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
+    post_id = Column(Integer, ForeignKey('post.id'),nullable=False)
+    post = relationship(Post)
+
+
+
 class Comment(Base):
     __tablename__ = 'comment'
     # Here we define columns for the table person
@@ -46,15 +58,11 @@ class Comment(Base):
     id = Column(Integer, primary_key=True)
     comment_text = Column(String(250), nullable=False)
     author_id = Column(Integer, ForeignKey('user.id'),primary_key=True)
-    post_id = Column(String(250), ForeignKey('post.id'),nullable=False)
-
-class Post(Base):
-    __tablename__ = 'post'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    user_id  = Column(Integer, ForeignKey('user.id'))
+    author = relationship(User)
+    post_id = Column(Integer, ForeignKey('post.id'),nullable=False)
+    post = relationship(Post)
     
+
 class MyEnum(enum.Enum):
     video = 1
     photo = 2
@@ -66,6 +74,7 @@ class Media(Base):
     type = Column(Enum(MyEnum))
     url  = Column(String(250),nullable=False)
     post_id = Column(Integer, ForeignKey('post.id'))
+    post = relationship(Post)
 
 
 
