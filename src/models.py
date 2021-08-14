@@ -43,10 +43,9 @@ class Post(Base):
 
 class Likes(Base):
     __tablename__ = 'likes'
-    id = Column(Integer, primary_key=True)
-    user_id  = Column(Integer, ForeignKey('user.id'))
+    user_id  = Column(Integer, ForeignKey('user.id'),primary_key=True)
     user = relationship(User)
-    post_id = Column(Integer, ForeignKey('post.id'),nullable=False)
+    post_id = Column(Integer, ForeignKey('post.id'),primary_key=True)
     post = relationship(Post)
 
 
